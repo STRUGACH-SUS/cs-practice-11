@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 namespace App;
 
-public class Crud
+public class CRUD
 {
     public static async Task<Note> Create(string name, string typeOfSqlite, string typeInCSharp, CancellationToken ct = default)
     {
