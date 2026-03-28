@@ -11,7 +11,7 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        CRUD.Create(name, typeOfSqlite, typeInCSharp);
+        CRUD.Create(name, typeOfSqlite, typeInCSharp).Wait();
         var result = db.Notes.Select(x => x.Name).Contains(name);
         //Assert
         Assert.True(result);
@@ -26,7 +26,7 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        CRUD.Create(search, "", "");
+        CRUD.Create(search, "", "").Wait();
         var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
         //Assert
         Assert.True(result);
@@ -54,7 +54,7 @@ public class CRUDTests
         var db = new DataContext();
         db.Database.EnsureCreated();
         var record = CRUD.Create("", "", "").Result;
-        CRUD.Update(record,changes, "", "");
+        CRUD.Update(record,changes, "", "").Wait();
         var result = db.Notes.Select(x => x.Name).Contains(changes);
         //Assert
         Assert.True(result);
@@ -69,7 +69,7 @@ public class CRUDTests
         var db = new DataContext();
         db.Database.EnsureCreated();
         var record = CRUD.Create(search, "", "").Result;
-        CRUD.Delete(record);
+        CRUD.Delete(record).Wait();
         var result = db.Notes.Select(x => x.Name).Contains(search);
         //Assert
         Assert.False(result);
