@@ -11,7 +11,7 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        CRUD.Create(name, typeOfSqlite, typeInCSharp, default);
+        CRUD.Create(name, typeOfSqlite, typeInCSharp);
         var result = db.Notes.Select(x => x.Name).Contains(name);
         //Assert
         Assert.True(result);
@@ -26,8 +26,8 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        CRUD.Create(search, "", "", default);
-        var result = CRUD.Read(search, default).Result.Select(x => x.Name).Contains(search);
+        CRUD.Create(search, "", "");
+        var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
         //Assert
         Assert.True(result);
     }
@@ -40,7 +40,7 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        var result = CRUD.Read(search, default).Result.Select(x => x.Name).Contains(search);
+        var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
         //Assert
         Assert.False(result);
     }
@@ -53,8 +53,8 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        var record = CRUD.Create("", "", "", default).Result;
-        CRUD.Update(record,changes, "", "", default);
+        var record = CRUD.Create("", "", "").Result;
+        CRUD.Update(record,changes, "", "");
         var result = db.Notes.Select(x => x.Name).Contains(changes);
         //Assert
         Assert.True(result);
@@ -68,8 +68,8 @@ public class CRUDTests
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        var record = CRUD.Create(search, "", "", default).Result;
-        CRUD.Delete(record,default);
+        var record = CRUD.Create(search, "", "").Result;
+        CRUD.Delete(record);
         var result = db.Notes.Select(x => x.Name).Contains(search);
         //Assert
         Assert.False(result);
