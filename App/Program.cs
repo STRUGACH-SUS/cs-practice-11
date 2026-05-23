@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 await using var db = new DataContext();
-//await db.Database.EnsureCreatedAsync();
+await db.Database.EnsureCreatedAsync();
 var records =await db.Notes.ToListAsync();
 foreach (var record in records)
 {
