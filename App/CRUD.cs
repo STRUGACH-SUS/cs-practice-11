@@ -3,15 +3,13 @@ namespace App;
 
 public class CRUD
 {
-    public static async Task<Note> Create(string name, string typeOfSqlite, string typeInCSharp, CancellationToken ct = default)
+    public static async Task<Note> Create(string name, CancellationToken ct = default)
     {
         await using var db = new DataContext();
         var record = new Note
         {
             Name = name,
-            TypeOfSqlite = typeOfSqlite,
-            TypeInCSharp = typeInCSharp
-            
+            CreatedAt = DateTimeOffset.Now
         };
         db.Notes.Add(record);
         await db.SaveChangesAsync(ct);
@@ -27,12 +25,11 @@ public class CRUD
         return result;
     }
     
-    public static async Task Update(Note record, string name, string typeOfSqlite, string typeInCSharp, CancellationToken ct = default)
+    public static async Task Update(Note record, string name, CancellationToken ct = default)
     {
         await using var db = new DataContext();
         record.Name = name;
-        record.TypeOfSqlite =  typeOfSqlite;
-        record.TypeInCSharp = typeInCSharp;
+        record.CreatedAt =  DateTimeOffset.Now;
         db.Notes.Update(record);
         await db.SaveChangesAsync(ct);
     }

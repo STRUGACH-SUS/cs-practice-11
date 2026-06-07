@@ -6,5 +6,5 @@ await db.Database.EnsureCreatedAsync();
 var records =await db.Notes.ToListAsync();
 foreach (var record in records)
 {
-    Console.WriteLine($"{record.Name}, {record.TypeOfSqlite}, {record.TypeInCSharp}");
+    Console.WriteLine($"{record.Name}, {record.CreatedAt}");
 }

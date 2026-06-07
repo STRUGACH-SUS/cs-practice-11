@@ -5,15 +5,15 @@ namespace App.Tests;
 public class CRUDTests
 {
     [Theory]
-    [InlineData("Name","TEXT","string")]
-    [InlineData("1","1","1")]
-    [InlineData("","","")]
-    public void Create_PassValid_Success(string name, string typeOfSqlite, string typeInCSharp)
+    [InlineData("Name")]
+    [InlineData("1")]
+    [InlineData("")]
+    public void Create_PassValid_Success(string name)
     {
         //Act
         var db = new DataContext();
         db.Database.EnsureCreated();
-        CRUD.Create(name, typeOfSqlite, typeInCSharp).Wait();
+        CRUD.Create(name).Wait();
         var result = db.Notes.Select(x => x.Name).Contains(name);
         //Assert
         db.Database.EnsureDeleted();
@@ -28,7 +28,7 @@ public class CRUDTests
         db.Database.EnsureCreated();
         //Assert
         db.Database.EnsureDeleted();
-        Assert.Throws<AggregateException>(() => CRUD.Create(null!, null!, null!).Wait());
+        Assert.Throws<AggregateException>(() => CRUD.Create(null!).Wait());
     }
     
     [Theory]
@@ -43,8 +43,7 @@ public class CRUDTests
         db.Notes.Add(new Note
         {
             Name = search,
-            TypeInCSharp = "",
-            TypeOfSqlite = ""
+            CreatedAt = DateTimeOffset.Now
         });
         db.SaveChangesAsync().Wait();
         var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
@@ -86,11 +85,10 @@ public class CRUDTests
         var record = new Note
         {
             Name = "",
-            TypeInCSharp = "",
-            TypeOfSqlite = ""
+            CreatedAt = DateTimeOffset.Now
         };
         db.Notes.Add(record);
-        CRUD.Update(record,changes, "", "").Wait();
+        CRUD.Update(record,changes).Wait();
         var result = db.Notes.Select(x => x.Name).Contains(changes);
         //Assert
         db.Database.EnsureDeleted();
@@ -109,10 +107,9 @@ public class CRUDTests
         var record = new Note
         {
             Name = "",
-            TypeInCSharp = "",
-            TypeOfSqlite = ""
+            CreatedAt = DateTimeOffset.Now
         };
-        CRUD.Update(record,changes, "", "").Wait();
+        CRUD.Update(record,changes).Wait();
         var result = record.Id == 0;
         //Assert
         db.Database.EnsureDeleted();
@@ -127,12 +124,11 @@ public class CRUDTests
         var record = new Note
         {
             Name = "1",
-            TypeInCSharp = "1",
-            TypeOfSqlite = "1"
+            CreatedAt = DateTimeOffset.Now
         };
         //Assert
         db.Database.EnsureDeleted();
-        Assert.Throws<AggregateException>(() => CRUD.Update(record, null!, null!, null!).Wait());
+        Assert.Throws<AggregateException>(() => CRUD.Update(record, null!).Wait());
     }
     
     [Theory]
@@ -147,8 +143,7 @@ public class CRUDTests
         var record = new Note
         {
             Name = search,
-            TypeInCSharp = "",
-            TypeOfSqlite = ""
+            CreatedAt = DateTimeOffset.Now
         };
         db.Notes.Add(record);
         db.SaveChanges();
@@ -171,8 +166,7 @@ public class CRUDTests
         var record = new Note
         {
             Name = search,
-            TypeInCSharp = "",
-            TypeOfSqlite = ""
+            CreatedAt = DateTimeOffset.Now
         };
         //Assert
         Assert.Throws<AggregateException>(()=>CRUD.Delete(record).Wait());
