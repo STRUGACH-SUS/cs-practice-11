@@ -12,11 +12,11 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
-        CRUD.Create(name).Wait();
+        db.Database.EnsureCreatedAsync();
+        CRUD.Create(name);
         var result = db.Notes.Select(x => x.Name).Contains(name);
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.True(result);
     }
     
@@ -25,10 +25,10 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         //Assert
-        db.Database.EnsureDeleted();
-        Assert.Throws<AggregateException>(() => CRUD.Create(null!).Wait());
+        db.Database.EnsureDeletedAsync();
+        Assert.Throws<AggregateException>(() => CRUD.Create(null!).Result);
     }
     
     [Theory]
@@ -39,16 +39,16 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         db.Notes.Add(new Note
         {
             Name = search,
             CreatedAt = DateTimeOffset.Now
         });
-        db.SaveChangesAsync().Wait();
+        db.SaveChangesAsync();
         var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.True(result);
     }
     
@@ -60,10 +60,10 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         var result = CRUD.Read(search).Result.Select(x => x.Name).Contains(search);
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.False(result);
     }
 
@@ -81,17 +81,17 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         var record = new Note
         {
             Name = "",
             CreatedAt = DateTimeOffset.Now
         };
         db.Notes.Add(record);
-        CRUD.Update(record,changes).Wait();
+        CRUD.Update(record,changes);
         var result = db.Notes.Select(x => x.Name).Contains(changes);
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.True(result);
     }
 
@@ -103,32 +103,32 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         var record = new Note
         {
             Name = "",
             CreatedAt = DateTimeOffset.Now
         };
-        CRUD.Update(record,changes).Wait();
+        CRUD.Update(record,changes);
         var result = record.Id == 0;
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.False(result);
     }
     
     [Fact]
-    public void Update_PassNull_Fail()
+    public async void Update_PassNull_Fail()
     {
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        await db.Database.EnsureCreatedAsync();
         var record = new Note
         {
-            Name = "1",
+            Name = "",
             CreatedAt = DateTimeOffset.Now
         };
         //Assert
-        db.Database.EnsureDeleted();
-        Assert.Throws<AggregateException>(() => CRUD.Update(record, null!).Wait());
+        await db.Database.EnsureDeletedAsync();
+        await Assert.ThrowsAsync<DbUpdateException>(()=>CRUD.Update(record,null!));
     }
     
     [Theory]
@@ -139,7 +139,7 @@ public class CRUDTests
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        db.Database.EnsureCreatedAsync();
         var record = new Note
         {
             Name = search,
@@ -147,10 +147,10 @@ public class CRUDTests
         };
         db.Notes.Add(record);
         db.SaveChanges();
-        CRUD.Delete(record).Wait();
+        CRUD.Delete(record);
         var result = db.Notes.Select(x => x.Name).Contains(search);
         //Assert
-        db.Database.EnsureDeleted();
+        db.Database.EnsureDeletedAsync();
         Assert.False(result);
     }
     
@@ -158,17 +158,18 @@ public class CRUDTests
     [InlineData("Level")]
     [InlineData("7")]
     [InlineData("")]
-    public void Delete_PassError_Fail(string search)
+    public async void Delete_PassError_Fail(string search)
     {
         //Act
         var db = new DataContext();
-        db.Database.EnsureCreated();
+        await db.Database.EnsureCreatedAsync();
         var record = new Note
         {
             Name = search,
             CreatedAt = DateTimeOffset.Now
         };
         //Assert
-        Assert.Throws<AggregateException>(()=>CRUD.Delete(record).Wait());
+        await db.Database.EnsureDeletedAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(()=>CRUD.Delete(record));
     }
 }
